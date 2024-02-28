@@ -1,15 +1,16 @@
 import random
+from typing import Iterable, Callable
 
 
-def nlogn_median(data_list):
+def nlogn_median(data_list: Iterable) -> float:
     data_list = sorted(data_list)
     if len(data_list) % 2 == 1:
-        return data_list[len(data_list) // 2]
+        return float(data_list[len(data_list) // 2])
     else:
         return 0.5 * (data_list[len(data_list) // 2 - 1] + data_list[len(data_list) // 2])
 
 
-def quickselect_median(data_list, pivot_fn=random.choice):
+def quickselect_median(data_list: Iterable, pivot_fn: Callable = random.choice) -> float:
     if len(data_list) % 2 == 1:
         return __quickselect(data_list, len(data_list) // 2, pivot_fn)
     else:
@@ -17,7 +18,7 @@ def quickselect_median(data_list, pivot_fn=random.choice):
                       __quickselect(data_list, len(data_list) // 2, pivot_fn))
 
 
-def __quickselect(data_list, index, pivot_fn):
+def __quickselect(data_list: Iterable, index: int, pivot_fn: Callable) -> int:
     """
     Выбираем k-тый элемент в списке l (с нулевой базой)
     :param data_list: список числовых данных
