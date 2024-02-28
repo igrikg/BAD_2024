@@ -16,7 +16,7 @@ def time_display_decorator(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
-        print("Time: ", round(time.time() - start_time, 2))
+        print("Operations execution time: ", round(time.time() - start_time, 2),'s')
         return result
     return wrapper
 
