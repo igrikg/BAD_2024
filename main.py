@@ -1,5 +1,6 @@
-from statistic import get_parameters_fromfile, get_parameter_by_numpy
+from statistic import array_info, array_info_by_numpy
 
 
-get_parameter_by_numpy()
-get_parameters_fromfile()
+if __name__ == '__main__':
+    print(array_info_by_numpy())
+    print(array_info())
