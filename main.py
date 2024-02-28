@@ -4,7 +4,7 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='NumberFileInfo',
                                      description="""This program can calculate min, max, mean, median,
-                                      maximum length of increasing and decrising sequences (numpy variant
+                                      maximum length of increasing and decreasing sequences (numpy variant
                                       is not include this options) from file or array"""
                                      )
     parser.add_argument("-f", "--file", nargs='?', default="10m.txt", help='File name, (default: 10m.txt)')

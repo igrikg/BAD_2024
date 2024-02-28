@@ -9,9 +9,19 @@ __min_none, __max_none, __sum_none = map(work_with_none_decorator, [min, max, su
 
 @dataclass
 class ResultData:
+    """Dataclass for  calculation result
+    Args:
+        min: int - the minimum value in the array
+        max: int - the maximum value in the array
+        median: int - the median of the array
+        mean: float = the mean value of the array
+        len_sequence_go_up: int  - the maximum length of the increasing sequence in the array
+        len_sequence_go_down: int - the maximum length of the descending sequence in the array
+
+    """
     min: int = None
     max: int = None
-    median: int = None
+    median: float = None
     mean: float = None
     len_sequence_go_up: int = None
     len_sequence_go_down: int = None
@@ -23,6 +33,16 @@ class ResultData:
 
 @time_display_decorator
 def array_info_by_numpy(data: str | Iterable = '10m.txt') -> ResultData:
+    """
+    Calculate min, max, mean, median from file or array by using numpy library
+
+    :param data: name or path to txt file with array
+                 or
+                 iterable object like list or tuple with array
+    :return:
+        ResultData - dataclass with all parameters
+        len_sequence_go_up, len_sequence_go_down are not calculate (default values are None)
+    """
     try:
         import numpy as np
     except ImportError:
@@ -44,6 +64,7 @@ def array_info_by_numpy(data: str | Iterable = '10m.txt') -> ResultData:
 
 
 def __calc_sequence(previous_numer: int, current_number: int, counter: int, result: int, go_up: bool = True) -> tuple[int]:
+    """Function for counting of sentence elements"""
     if previous_numer is not None and (
             (go_up and (previous_numer < current_number)) or (not go_up and (previous_numer > current_number))):
         counter += 1
@@ -53,6 +74,13 @@ def __calc_sequence(previous_numer: int, current_number: int, counter: int, resu
 
 
 def __calc_info__array(numbers_list: Iterable):
+    """
+        Calculate min, max, mean, median of array
+
+        :param iterable object like list or tuple with array
+        :return:
+            ResultData - dataclass with all parameters
+    """
     result = ResultData()
     data_array = []
     number_line = 0
@@ -81,6 +109,16 @@ def __calc_info__array(numbers_list: Iterable):
 
 @time_display_decorator
 def array_info(data: str | Iterable = '10m.txt') -> ResultData:
+    """
+        Calculate min, max, mean, median, maximum length of increasing and decreasing sequences from file or array
+
+        :param data: name or path to txt file with array
+                     or
+                     iterable object like list or tuple with array
+        :return:
+            ResultData - dataclass with all parameters
+
+    """
     if isinstance(data, str):
         with open(data) as file:
             file.seek(0)

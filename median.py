@@ -2,22 +2,30 @@ import random
 from typing import Iterable, Callable
 
 
-def calc(data_list: Iterable, pivot_fn: Callable = random.choice) -> float:
-    if len(data_list) % 2 == 1:
-        return __quickselect(data_list, len(data_list) // 2, pivot_fn)
-    else:
-        return 0.5 * (__quickselect(data_list, len(data_list) // 2 - 1, pivot_fn) +
-                      __quickselect(data_list, len(data_list) // 2, pivot_fn))
-
-
-def __quickselect(data_list: Iterable, index: int, pivot_fn: Callable) -> int:
+def calc(data_list: Iterable) -> float:
     """
-    Выбираем k-тый элемент в списке l (с нулевой базой)
-    :param data_list: список числовых данных
-    :param index: индекс
-    :param pivot_fn: функция выбора pivot
+    Median calculation in the array. Algorithm from https://habr.com/ru/articles/346930/
+    :param data_list: array with data
+    :return:
+        median value (float)
+    """
+    if len(data_list) % 2 == 1:
+        return __quickselect(data_list, len(data_list) // 2)
+    else:
+        return 0.5 * (__quickselect(data_list, len(data_list) // 2 - 1) +
+                      __quickselect(data_list, len(data_list) // 2))
+
+
+def __quickselect(data_list: Iterable, index: int, pivot_fn: Callable = random.choice) -> int:
+    """
+    Recursive function for finding median in the array
+
+    :param data_list: array with data
+    :param index: index of finding elements median in our case
+    :param pivot_fn: function of choosing element (default: random.choice)
     :return: k-тый элемент l
     """
+
     if len(data_list) == 1:
         assert index == 0
         return data_list[0]
