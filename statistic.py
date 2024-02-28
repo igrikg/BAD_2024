@@ -4,6 +4,8 @@ from typing import Iterable
 from utils import time_display_decorator, work_with_none_decorator
 import median
 
+__min_none, __max_none, __sum_none = map(work_with_none_decorator, [min, max, sum])
+
 
 @dataclass
 class ResultData:
@@ -15,13 +17,12 @@ class ResultData:
     len_sequence_go_down: int = None
 
     def __str__(self):
-        return (f'Minimum:{self.min}\nMaximum: {self.max}\nMedian: {self.median}\nMean: {self.mean}\n'
-                f'Length of increasing sequence:{self.len_sequence_go_up}\n'
-                f'Length of decreasing sequence:{self.len_sequence_go_down}')
-
+        return (f'Minimum: {self.min}\nMaximum: {self.max}\nMedian: {self.median}\nMean: {self.mean}\n'
+                f'Length of increasing sequence: {self.len_sequence_go_up}\n'
+                f'Length of decreasing sequence: {self.len_sequence_go_down}')
 
 @time_display_decorator
-def array_info_by_numpy(file_name: str = '10m.txt'):
+def array_info_by_numpy(data: str | Iterable = '10m.txt') -> ResultData:
     try:
         import numpy as np
     except ImportError:
@@ -29,7 +30,12 @@ def array_info_by_numpy(file_name: str = '10m.txt'):
         return
 
     result = ResultData()
-    data_array = np.loadtxt(file_name, dtype=int)
+    if isinstance(data, str):
+        data_array = np.loadtxt(data, dtype=int)
+    else:
+        data_array = np.array(data, dtype=int)
+    if not len(data_array) > 0:
+        return result
     result.mean = data_array.mean()
     result.max = data_array.max()
     result.min = data_array.min()
@@ -37,36 +43,48 @@ def array_info_by_numpy(file_name: str = '10m.txt'):
     return result
 
 
-@time_display_decorator
-def array_info(file_name: str = '10m.txt') -> ResultData:
+def __calc_sequence(previous_numer: int, current_number: int, counter: int, result: int, go_up: bool = True) -> tuple[int]:
+    if previous_numer is not None and (
+            (go_up and (previous_numer < current_number)) or (not go_up and (previous_numer > current_number))):
+        counter += 1
+    else:
+        return __max_none(result, counter), 1
+    return __max_none(result, counter), counter
+
+
+def __calc_info__array(numbers_list: Iterable):
     result = ResultData()
     data_array = []
     number_line = 0
-    current_go_up = 1
-    current_go_down = 1
+    current_go_up, current_go_down = 1, 1
     prev_number = None
-    min_none, max_none, sum_none = map(work_with_none_decorator, [min, max, sum])
-    with open(file_name) as f:
-        f.seek(0)
-        for line in f:
-            number = int(line)
 
-            result.min = min_none(result.min, number)
-            result.max = max_none(result.max, number)
-            result.mean = sum_none(result.mean, number)
-            number_line += 1
-            # sequence
-            if prev_number is not None and prev_number < number:
-                current_go_up += 1
-            else:
-                result.len_sequence_go_up = max_none(result.len_sequence_go_up, current_go_up)
-            if prev_number is not None and prev_number > number:
-                current_go_down += 1
-            else:
-                result.len_sequence_go_down = max_none(result.len_sequence_go_down, current_go_down)
-            prev_number = number
-            data_array.append(number)
+    for line in numbers_list:
+        number = int(line)
+        result.min = __min_none(result.min, number)
+        result.max = __max_none(result.max, number)
+        result.mean = __sum_none(result.mean, number)
+        number_line += 1
+        # sequence calc
+        result.len_sequence_go_up, current_go_up = __calc_sequence(prev_number, number, current_go_up,
+                                                                   result.len_sequence_go_up)
+        result.len_sequence_go_down, current_go_down = __calc_sequence(prev_number, number, current_go_down,
+                                                                       result.len_sequence_go_down, False)
+        prev_number = number
+        data_array.append(number)
+    if not len(data_array) > 0:
+        return result
     result.mean /= number_line
-    result.median = median.quickselect_median(data_array)
+    result.median = median.calc(data_array)
     return result
 
+
+@time_display_decorator
+def array_info(data: str | Iterable = '10m.txt') -> ResultData:
+    if isinstance(data, str):
+        with open(data) as file:
+            file.seek(0)
+            result = __calc_info__array(file)
+    else:
+        result = __calc_info__array(data)
+    return result
